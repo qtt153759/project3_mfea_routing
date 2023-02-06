@@ -1,3 +1,3 @@
-# A Multi-task Approach For Maximum Survival Ratio Problem In Large-Scale Wireless Rechargeable Sensor Networks
-Run: python3 main.py
+# MFEA-charger-routing
+Run: python3 main.py<br />
 Reference: https://ieeexplore.ieee.org/document/9504930
