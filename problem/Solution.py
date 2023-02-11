@@ -140,14 +140,14 @@ class Solution:
             print("Charging tour: ")
             
             for i in range(leng):
-                print(f"{self.path[a][i]} ")
+                print(f"{self.path[a][i]} ", end =" -> ")
                 visited[self.path[a][i]] = True
             print("")
 
             sum = 0.0
             print(f"Charging time: ")
             for i in range(leng):
-                print(f"{self.time[a][i]} ")
+                print(f"{self.time[a][i]} ", end =" + ")
                 sum += self.time[a][i]
 
             print("")
