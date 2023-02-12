@@ -56,8 +56,8 @@ class PIndividual:
         sectors = ProblemManager.subNet[taskIndex]
 
         for index, sector in enumerate(sectors):
-            if sector.getLifetime() > Configs.T:
-                self.gene[index] = 0.5 + 0.5 * Configs.rand.uniform(0,1)
+            # if sector.getLifetime() > Configs.T:
+            #     self.gene[index] = 0.5 + 0.5 * Configs.rand.uniform(0,1)
             if self.gene[index] <= 0.5:
                 list.append(Allele(self.gene[index],sector.id))
 
@@ -70,18 +70,14 @@ class PIndividual:
         for a in list:
             self.path.append(a.sensorId)
         pass
-
-    def calculateFitness(self) -> float:
-        """How good the individual is"""
-        self.decoding(self.skillFactor)
-
+    def calculateFitnessWithPath(self) -> float:
         w: list[float]
         w = self.getPriority()
 
         dead = 0
         totalLifetime = 0
         maxLifetime = 0
-
+        totalAfterT=0
         n = len(self.path)
         arriveTime: 'list[float]'
         arriveTime = []
@@ -115,14 +111,13 @@ class PIndividual:
             eRemain: float
             ub: float
             eRemain = s.E0 - arriveTime[i] * s.p
-            ub = (Configs.S_EMAX - eRemain) / (ch.U - s.p)
+            # ub = (Configs.S_EMAX - eRemain) / (ch.U - s.p)
             if eRemain < Configs.S_EMIN:
                 self.chargingTime[i] = 0
-            elif (self.chargingTime[i] > ub or True):
-                self.chargingTime[i] = ub
+            # elif (self.chargingTime[i] > ub or True):
+            #     self.chargingTime[i] = ub
             eAfterT: float
             eAfterT = s.E0 - Configs.T * s.p + self.chargingTime[i] * ch.U
-            
             if ( (eRemain < s.Emin - 1e-3) or (eAfterT < s.Emin - 1e-3) ) :
                 dead = dead + 1
 			
@@ -130,6 +125,7 @@ class PIndividual:
             lifetime = (s.E0 + self.chargingTime[i] * ch.U - s.Emin) / s.p
             totalLifetime += lifetime
             maxLifetime = max(lifetime, maxLifetime)
+            totalAfterT+=eAfterT
 
             if (i < n - 1):
                 arriveTime[i + 1] = arriveTime[i] + self.chargingTime[i] \
@@ -143,16 +139,23 @@ class PIndividual:
 
                 totalLifetime += lifetime
                 maxLifetime = max(lifetime, maxLifetime)
-            
+                eAfterT = s.E0 - Configs.T * s.p
+                totalAfterT+=eAfterT
+
 
 
         netSize = len(ProblemManager.subNet[self.skillFactor])
         networkSurvivability = (netSize - dead) / (1.0 * netSize)
-
+        energyRatioAfterT=totalAfterT/(netSize*Configs.S_EMAX)
         #unused
         #avgLifetime = totalLifetime / (1.0 * netSize)
 
-        return networkSurvivability;        
+        return networkSurvivability*0.8+0.2*energyRatioAfterT   
+
+    def calculateFitness(self) -> float:
+        """How good the individual is"""
+        self.decoding(self.skillFactor) #from gên -> get path
+        return self.calculateFitnessWithPath()
 
     def getPriority(self) -> 'list[float]':
         sum = 0.0
@@ -175,11 +178,15 @@ class PIndividual:
             if u <= 0.5:
                 deltaL = pow(2 * u, 1.0 / (Configs.NM + 1)) - 1
                 p = self.gene[i] * (1.0 + deltaL)
+                # self.gene[i]= 0.5+deltaL*(0.5-self.gene[i])
                 self.gene[i] = max(0,min(1,p))
+                # print("u<0.5",self.gene[i],p)
             else:
                 deltaR = 1.0 - pow(2 * (1 - u), 1.0 / (Configs.NM + 1))
                 p = self.gene[i] + deltaR * (1 - self.gene[i])
+                # self.gene[i]= 0.5+deltaR*(self.gene[i]-0.5)
                 self.gene[i] = max(0,min(1,p))
+                # print("u>0.5",self.gene[i],p)
     
             
     def getFitness(self, task: int) -> float:
@@ -191,6 +198,9 @@ class PIndividual:
     def clone(self) -> 'PIndividual':
         indiv = PIndividual()
         indiv.gene = self.gene.copy()
+        indiv.skillFactor=self.skillFactor
+        indiv.path=self.path.copy()
+        indiv.fitness=self.fitness
         return indiv
 
     def duplicate(self) -> 'PIndividual':
@@ -209,6 +219,89 @@ class PIndividual:
         indiv.factorialRank = self.factorialRank.copy()
         return indiv
 
+        # 2 opt
+    def tsp_2_opt(self)->'PIndividual':
+        sectors = ProblemManager.subNet[self.skillFactor]
+        sectorsDict= {sectors[i].id: i for i in range(0, len(sectors))}
+        
+        improved = 0
+        best_found_individual = self.clone()
+        while improved<10:
+            i =Configs.rand.randint(1,len(best_found_individual.path) - 2)
+            j= Configs.rand.randint(i+1,len(best_found_individual.path) - 1)
+            
+            new_individual = self.swap_2opt(best_found_individual, i, j,sectorsDict)
+            new_individual.fitness=new_individual.calculateFitnessWithPath()
+            if new_individual.fitness < best_found_individual.fitness:
+                best_found_individual = new_individual
+                improved += 1
+          
+        return best_found_individual
+
+    def swap_2opt(self,best_found_individual:'PIndividual',i:int,j:int,sectorsDict:'dict')->'PIndividual':
+        
+        new_individual=best_found_individual.clone()
+        new_individual.path = best_found_individual.path[0:i]
+        new_individual.path.extend(reversed(best_found_individual.path[i:j + 1]))
+        new_individual.path.extend(best_found_individual.path[j + 1:])
+   
+        for t in range(i,j+1):
+            a=sectorsDict[best_found_individual.path[t]]
+            b=sectorsDict[new_individual.path[t]]
+            new_individual.gene[b]=best_found_individual.gene[a]
+        return new_individual
+
+# 3-opt
+    def tsp_3_opt(self)->'PIndividual':
+    
+        moves_cost:list[PIndividual]
+        sectors = ProblemManager.subNet[self.skillFactor]
+        sectorsDict= {sectors[i].id: i for i in range(0, len(sectors))}
+
+        improved = 0
+        best_found_individual = self.clone()
+        best_found_individual.fitness=best_found_individual.fitness
+        while improved<3:
+            k= Configs.rand.randint(2,len(best_found_individual.path) - 2)
+            i =Configs.rand.randint(1,k)
+            j= Configs.rand.randint(k+1,len(best_found_individual.path) - 1)
+
+        
+            moves_cost = self.get_solution_cost_change(best_found_individual, i, j, k)
+            # we need the minimum value of substraction of old route - new route
+            best_return_3_opt = min(moves_cost, key=lambda item: item.fitness)
+            # print(f'compare {best_return_3_opt.fitness} va {best_found_individual.fitness}')
+            if best_return_3_opt.fitness < best_found_individual.fitness:
+                for t in range(len(best_found_individual.path)):
+                    a=sectorsDict[best_found_individual.path[t]]
+                    b=sectorsDict[best_return_3_opt.path[t]]
+                    best_return_3_opt.gene[b]=best_found_individual.gene[a]
+                best_found_individual = best_return_3_opt
+                improved += 1
+        # just to start with the same node -> we will need to cycle the results.
+        return best_found_individual
+
+    def get_solution_cost_change(self,best_found_individual:'PIndividual', i:int, j:int, k:int)->'list[PIndividual]':
+        number_Of_3_OPT_case=8
+        new_individuals:list[PIndividual]
+        new_individuals=[]
+        for i in range(number_Of_3_OPT_case):
+            new_individual=best_found_individual.clone()
+            new_individuals.append(new_individual)
+
+        new_individuals[0].path =  new_individuals[0].path[:i + 1] +  new_individuals[0].path[i+1:k + 1] + new_individuals[0].path[k+1: j + 1] + new_individuals[0].path[j+1: ]
+        new_individuals[1].path =  new_individuals[1].path[:i + 1] +  new_individuals[1].path[i+1:k + 1] + new_individuals[1].path[j: k: -1] + new_individuals[1].path[j+1: ]
+        new_individuals[2].path =  new_individuals[2].path[:i + 1] +  new_individuals[2].path[k:i: -1] +  new_individuals[2].path[k+1: j + 1] +  new_individuals[2].path[j+1: ]
+        new_individuals[3].path =  new_individuals[3].path[:i + 1] +  new_individuals[3].path[k:i: -1] +  new_individuals[3].path[j: k: -1] +  new_individuals[3].path[j+1: ]
+        new_individuals[4].path =  new_individuals[4].path[:i + 1] +  new_individuals[4].path[k+1: j + 1] +  new_individuals[4].path[i+1:k + 1] +  new_individuals[4].path[j+1: ]
+        new_individuals[5].path =  new_individuals[5].path[:i + 1] +  new_individuals[5].path[k+1: j + 1] +  new_individuals[5].path[k:i: -1] +  new_individuals[5].path[j+1: ]
+        new_individuals[6].path =  new_individuals[6].path[:i + 1] +  new_individuals[6].path[j: k: -1] +  new_individuals[6].path[i+1:k + 1] +  new_individuals[6].path[j+1: ]
+        new_individuals[7].path =  new_individuals[7].path[:i + 1] +  new_individuals[7].path[j: k: -1] +  new_individuals[7].path[k:i: -1] +  new_individuals[7].path[j+1: ]
+        
+        for i in range(number_Of_3_OPT_case):
+            new_individuals[i].fitness=new_individuals[i].calculateFitnessWithPath()
+        return new_individuals
+            
     def __eq__(self, other: 'PIndividual'):
         if self.fitness == other.fitness:
             return True

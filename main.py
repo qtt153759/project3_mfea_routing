@@ -1,4 +1,6 @@
 import sys
+import time
+from algo.path.reproduction.GA_Reproductioner import GA_Reproductioner
 from problem.Configs import Configs
 from problem.ProblemManager import ProblemManager
 from elements.Charger import Charger
@@ -13,7 +15,8 @@ from algo.ProblemSolver import ProblemSolver
 #     data = input("Data path: ")
 # else:
 #     data = sys.argv[1]
-data = r"C:\Users\Duong\OneDrive - Hanoi University of Science and Technology\Documents\20221\EvolutionAlgorithm\code\WRSN-CEC2021-MMC-MFEA\data\ga100.txt"
+start=time.time()
+data = r"./data/mfea_1000.txt"
 k = 5
 Configs.rand.seed(0)
 Configs.U = 5
@@ -28,3 +31,4 @@ for i in range(k):
 PSolver.reproductioner = MFEA_Reproductioner()
 solution = ProblemSolver.solve()
 solution.log()
+print("total calculate time:",time.time()-start)

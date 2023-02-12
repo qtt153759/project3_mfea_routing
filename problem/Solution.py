@@ -140,14 +140,14 @@ class Solution:
             print("Charging tour: ")
             
             for i in range(leng):
-                print(f"{self.path[a][i]} ")
+                print(f"{self.path[a][i]} ", end =" -> ")
                 visited[self.path[a][i]] = True
             print("")
 
             sum = 0.0
             print(f"Charging time: ")
             for i in range(leng):
-                print(f"{self.time[a][i]} ")
+                print(f"{self.time[a][i]} ", end =" + ")
                 sum += self.time[a][i]
 
             print("")
@@ -157,7 +157,7 @@ class Solution:
             print(f"Total energy used: {ch.getEmove(self.path[a]) + sum * ch.U}")
             print(f"Charging round duration: {ch.getEmove(self.path[a]) / ch.Pm + sum}")
 
-            print("ID | time_arrive | E_remain | E_after_charge ")
+            print("ID | p | E0 | time_arrive | E_remain | time_charge | energy_charge| E_after_charge | E_after_cycle")
             arriveTime[0] = ProblemManager.distance[ProblemManager.serviceStation.getId()][self.path[a][0]] / Configs.speed
             for i in range(leng):
                 s = ProblemManager.getSensorById(self.path[a][i])
@@ -165,10 +165,10 @@ class Solution:
                 eAfterCharged = eRemain + self.time[a][i] * (ch.U - s.p)
                 eAfterT = s.E0 - Configs.T * s.p + self.time[a][i] * ch.U
 
-                sensorDetails = f"{s.id:.2f} | {arriveTime[i]:.2f} | {eRemain:.2f} | {eAfterCharged:.2f}"
+                sensorDetails = f"{s.id} | {s.p:.2f} | {s.E0:.2f} | {arriveTime[i]:.2f} | {eRemain:.2f} | {self.time[a][i]:.2f} | {(self.time[a][i]*ch.U):.2f} | {eAfterCharged:.2f} | {eAfterT:.2f}"
 
                 if (eRemain < s.Emin or eAfterT < s.Emin):
-                    print(sensorDetails, sys.stderr)
+                    prRed(sensorDetails)
                     dead+=1
                 else:
                     print(sensorDetails)
@@ -186,10 +186,10 @@ class Solution:
             for s in ProblemManager.subNet[a]:
                 if (not visited[s.getId()]):
                     eAfterT = s.E0 - Configs.T * s.p
-                    sensorDetails = f"{s.id:.2f} | {s.p:.2f} | {s.E0:.2f} | {eAfterT:.2f}"
+                    sensorDetails = f"{s.id} | {s.p:.2f} | {s.E0:.2f} | {eAfterT:.2f}"
 
                     if (eAfterT < Configs.S_EMIN):
-                        print(sensorDetails)
+                        prRed(sensorDetails)
                         dead+=1
                     else:
                         print(sensorDetails)
@@ -210,6 +210,7 @@ class Solution:
         print(f"Traveling energy: {emove}")
 
     
+def prRed(skk): print("\033[91m{}\033[00m" .format(skk))
 
 
 

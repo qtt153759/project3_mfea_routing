@@ -30,8 +30,8 @@ class MFEA_Reproductioner(Reproductioner):
         par2 = PIndividual()
         while len(offspring) < Configs.P_POP_SIZE:
             #  select first parent by using binary tournament selection
-            p1 = matingPool.pop(Configs.rand.randint(0, int(len(matingPool) / 2)))
-            p2 = matingPool.pop(Configs.rand.randint(0, int(len(matingPool) / 2)))
+            p1 = matingPool.pop(Configs.rand.randint(0, len(matingPool) -1))
+            p2 = matingPool.pop(Configs.rand.randint(0, len(matingPool) -1))
             if p1.scalarFitness >= p2.scalarFitness:
                 par1 = p1
                 matingPool.append(p2)
@@ -39,8 +39,8 @@ class MFEA_Reproductioner(Reproductioner):
                 par1 = p2
                 matingPool.append(p1)
             #  select the second parent
-            p1 = matingPool.pop(Configs.rand.randint(0, int(len(matingPool) / 2)))
-            p2 = matingPool.pop(Configs.rand.randint(0, int(len(matingPool) / 2)))
+            p1 = matingPool.pop(Configs.rand.randint(0, len(matingPool) -1))
+            p2 = matingPool.pop(Configs.rand.randint(0, len(matingPool) -1))
             if p1.scalarFitness >= p2.scalarFitness:
                 par2 = p1
                 matingPool.append(p2)
@@ -90,4 +90,9 @@ class MFEA_Reproductioner(Reproductioner):
             for indiv in child:
                 indiv.fitness = indiv.calculateFitness()
                 offspring.append(indiv)
+        for i in range(len(offspring)):
+            if Configs.rand.uniform(0,1)<0.1:
+                # print("before",offspring[i].fitness)
+                offspring[i]=offspring[i].tsp_3_opt()
+                # print("after",offspring[i].fitness)
         return offspring

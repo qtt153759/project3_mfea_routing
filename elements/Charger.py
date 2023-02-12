@@ -42,7 +42,7 @@ class Charger:
         return (self.E0 - travelingDistance * self.Pm / self.speed) / self.U
 
     @dispatch(list)
-    def getMaxChargingTime(self, path: list[int]):  # type: ignore
+    def getMaxChargingTime(self, path):  # type: ignore
         """Calculate maximum time that this charger can charge in a given moving path\n
             Can not exceed maximum time in config"""
         movingTime = self.getMovingTime(path)

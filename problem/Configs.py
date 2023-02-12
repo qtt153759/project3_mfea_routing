@@ -16,7 +16,7 @@ class Configs:
     DEFAULT_MCS = 5
     P_POP_SIZE_PER_TASK = 100
     P_POP_SIZE = int()
-    P_GENERATIONS = 250
+    P_GENERATIONS = 50
     RMP = 0.3
     NC = 15
     NM = 15
