@@ -52,8 +52,19 @@ class ProblemManager:
     maxSensorId: int
     """The maximun sensor id"""
 
+    networkSurvivability: float
+    networkSurvivability = 100.00
+    """Use to track survivability ratio over round loop"""
+
     @staticmethod
     def readInput(file: str, xp: float):
+        #clean up from previous run
+        ProblemManager.subNet = []
+        ProblemManager.sensors = []
+        ProblemManager.distance = []
+        ProblemManager._map = dict()
+        ProblemManager.nodes = []
+        ProblemManager.chargers = []
 
         #parse input
         with open(file, 'r') as lines:

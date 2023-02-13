@@ -108,7 +108,11 @@ class Solution:
         return result
 
 
-    def log(self) -> None:
+    def log(self, outputFileName: str) -> None:
+        f = open(outputFileName,"w")
+        firstLine = f"{ProblemManager.serviceStation.x} {ProblemManager.serviceStation.y}\n"
+        f.write(firstLine)
+
         V = len(self.path)
         print(f"Number of charging vehicles: {V}")
         print(f"Survey time: {Configs.T}")
@@ -166,7 +170,7 @@ class Solution:
                 eAfterT = s.E0 - Configs.T * s.p + self.time[a][i] * ch.U
 
                 sensorDetails = f"{s.id} | {s.p:.2f} | {s.E0:.2f} | {arriveTime[i]:.2f} | {eRemain:.2f} | {self.time[a][i]:.2f} | {(self.time[a][i]*ch.U):.2f} | {eAfterCharged:.2f} | {eAfterT:.2f}"
-
+                f.write(f"{s.x} {s.y} {s.p} {eAfterT}\n")
                 if (eRemain < s.Emin or eAfterT < s.Emin):
                     prRed(sensorDetails)
                     dead+=1
@@ -187,7 +191,7 @@ class Solution:
                 if (not visited[s.getId()]):
                     eAfterT = s.E0 - Configs.T * s.p
                     sensorDetails = f"{s.id} | {s.p:.2f} | {s.E0:.2f} | {eAfterT:.2f}"
-
+                    f.write(f"{s.x} {s.y} {s.p} {eAfterT}\n")
                     if (eAfterT < Configs.S_EMIN):
                         prRed(sensorDetails)
                         dead+=1
@@ -206,8 +210,10 @@ class Solution:
         
 
         print(f"Network survivability: {networkSurvivability}%")
+        ProblemManager.networkSurvivability = networkSurvivability
         print(f"Average dead duration: {totalLifetime / (1.0 * ProblemManager.initSensors)}")
         print(f"Traveling energy: {emove}")
+        f.close()
 
     
 def prRed(skk): print("\033[91m{}\033[00m" .format(skk))
