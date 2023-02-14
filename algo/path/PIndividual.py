@@ -103,6 +103,8 @@ class PIndividual:
         #repairing
         arriveTime[0] = ProblemManager.distance[ProblemManager.serviceStation.id][self.path[0]] /ch.speed
 
+        totalTimeRatio = 0.0
+
         for i in range(n):
             s = ProblemManager.getSensorById(self.path[i])
             self.chargingTime[i] = w[i] * maxCharingTime
@@ -123,6 +125,10 @@ class PIndividual:
 			
             lifetime: float
             lifetime = (s.E0 + self.chargingTime[i] * ch.U - s.Emin) / s.p
+
+            ######
+            totalTimeRatio += lifetime / Configs.T
+
             totalLifetime += lifetime
             maxLifetime = max(lifetime, maxLifetime)
             totalAfterT+=eAfterT
@@ -150,6 +156,7 @@ class PIndividual:
         #unused
         #avgLifetime = totalLifetime / (1.0 * netSize)
 
+        return networkSurvivability*0.8+0.2*totalTimeRatio   
         return networkSurvivability*0.8+0.2*energyRatioAfterT   
 
     def calculateFitness(self) -> float:
@@ -251,7 +258,7 @@ class PIndividual:
             new_individual.gene[b]=best_found_individual.gene[a]
         return new_individual
 
-# 3-opt
+# 3 opt
     def tsp_3_opt(self)->'PIndividual':
     
         moves_cost:list[PIndividual]
