@@ -233,7 +233,12 @@ class PIndividual:
         
         improved = 0
         best_found_individual = self.clone()
+        loopCounter = 0
         while improved<10:
+            loopCounter += 1
+            if loopCounter > 5000: #prevent dead loop
+                break
+            #print(f"2 opt improved {improved}, loop counter {loopCounter}")
             i =Configs.rand.randint(1,len(best_found_individual.path) - 2)
             j= Configs.rand.randint(i+1,len(best_found_individual.path) - 1)
             
@@ -242,6 +247,7 @@ class PIndividual:
             if new_individual.fitness < best_found_individual.fitness:
                 best_found_individual = new_individual
                 improved += 1
+                loopCounter = 0
           
         return best_found_individual
 
@@ -264,11 +270,15 @@ class PIndividual:
         moves_cost:list[PIndividual]
         sectors = ProblemManager.subNet[self.skillFactor]
         sectorsDict= {sectors[i].id: i for i in range(0, len(sectors))}
-
+        loopCounter = 0
         improved = 0
         best_found_individual = self.clone()
         best_found_individual.fitness=best_found_individual.fitness
         while improved<3:
+            loopCounter += 1
+            if loopCounter > 5000: #prevent dead loop
+                break
+            #print(f"3 opt improved {improved}, loop counter {loopCounter}")
             k= Configs.rand.randint(2,len(best_found_individual.path) - 2)
             i =Configs.rand.randint(1,k)
             j= Configs.rand.randint(k+1,len(best_found_individual.path) - 1)
@@ -285,6 +295,7 @@ class PIndividual:
                     best_return_3_opt.gene[b]=best_found_individual.gene[a]
                 best_found_individual = best_return_3_opt
                 improved += 1
+                loopCounter = 0
         # just to start with the same node -> we will need to cycle the results.
         return best_found_individual
 
