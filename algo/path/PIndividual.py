@@ -161,7 +161,7 @@ class PIndividual:
 
     def calculateFitness(self) -> float:
         """How good the individual is"""
-        self.decoding(self.skillFactor) #from gên -> get path
+        self.decoding(self.skillFactor) #from gene -> get path
         return self.calculateFitnessWithPath()
 
     def getPriority(self) -> 'list[float]':

@@ -3,6 +3,8 @@ from random import Random
 class Configs:
     rand = Random()
     T: float
+
+    #charging speed
     U = float()
     speed = float()
     E_MC = float()
