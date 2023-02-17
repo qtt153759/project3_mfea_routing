@@ -211,6 +211,11 @@ class Solution:
 
         print(f"Network survivability: {networkSurvivability}%")
         ProblemManager.networkSurvivability = networkSurvivability
+
+        networkSurvivabilityOverThousand=100 * (ProblemManager.initSensors - totalDead) /1000
+        print(f"networkSurvivabilityOverThousand: {networkSurvivabilityOverThousand}%")
+        ProblemManager.networkSurvivabilityOverThousand = networkSurvivabilityOverThousand
+
         print(f"Average dead duration: {totalLifetime / (1.0 * ProblemManager.initSensors)}")
         print(f"Traveling energy: {emove}")
         f.close()

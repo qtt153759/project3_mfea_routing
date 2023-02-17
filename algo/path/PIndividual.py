@@ -156,8 +156,8 @@ class PIndividual:
         #unused
         #avgLifetime = totalLifetime / (1.0 * netSize)
 
-        return networkSurvivability*0.8+0.2*totalTimeRatio   
-        return networkSurvivability*0.8+0.2*energyRatioAfterT   
+        return networkSurvivability*0.8+0.2*totalTimeRatio/netSize
+        # return networkSurvivability*0.8+0.2*energyRatioAfterT   
 
     def calculateFitness(self) -> float:
         """How good the individual is"""
@@ -228,6 +228,8 @@ class PIndividual:
 
         # 2 opt
     def tsp_2_opt(self)->'PIndividual':
+        if len(self.path)<15:
+            return self
         sectors = ProblemManager.subNet[self.skillFactor]
         sectorsDict= {sectors[i].id: i for i in range(0, len(sectors))}
         
@@ -266,7 +268,8 @@ class PIndividual:
 
 # 3 opt
     def tsp_3_opt(self)->'PIndividual':
-    
+        if len(self.path)<15:
+            return self
         moves_cost:list[PIndividual]
         sectors = ProblemManager.subNet[self.skillFactor]
         sectorsDict= {sectors[i].id: i for i in range(0, len(sectors))}
@@ -297,6 +300,7 @@ class PIndividual:
                 improved += 1
                 loopCounter = 0
         # just to start with the same node -> we will need to cycle the results.
+        # print(f'{len(best_found_individual.path)}:{improved}:{loopCounter}')
         return best_found_individual
 
     def get_solution_cost_change(self,best_found_individual:'PIndividual', i:int, j:int, k:int)->'list[PIndividual]':

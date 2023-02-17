@@ -24,7 +24,7 @@ else:
 outputPath = r"./output"
 #get a name for our output
 fileName = f"/{count}.txt"
-result = f"./{count}-survivability"
+result = f"/{count}-survivability"
 
 
 
@@ -54,8 +54,9 @@ solution.log(outputPath+fileName)
 
 f = open(outputPath+result, 'w')
 f.write(f"{ProblemManager.networkSurvivability}")
+f.write(f"{ProblemManager.networkSurvivabilityOverThousand}")
 f.close()
-result = f"./{count}-survivability"
+result = f"/{count}-survivability"
 print("total calculate time:",time.time()-start)
 
     

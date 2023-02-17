@@ -54,6 +54,8 @@ class ProblemManager:
 
     networkSurvivability: float
     networkSurvivability = 100.00
+
+    networkSurvivabilityOverThousand:float=100
     """Use to track survivability ratio over round loop"""
 
     @staticmethod
@@ -82,6 +84,8 @@ class ProblemManager:
                 y = float(line[1])
                 p = float(line[2])
                 e0 = float(line[3])
+                if e0<Configs.S_EMIN:
+                    continue
                 id = id+1
                 sensor = Sensor(id, x, y, e0, p*xp, Configs.S_EMAX, Configs.S_EMIN)
                 ProblemManager.sensors.append(sensor)
@@ -92,7 +96,7 @@ class ProblemManager:
 
             #init ProblemManager.initSensors
             ProblemManager.initSensors = len(ProblemManager.sensors)
-
+            print("total sensor",ProblemManager.initSensors)
             #init ProblemManager.nodes
             ProblemManager.nodes.append(ProblemManager.serviceStation)
             for sensor in ProblemManager.sensors:
