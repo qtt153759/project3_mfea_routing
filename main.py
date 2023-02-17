@@ -30,7 +30,7 @@ result = f"/{count}-survivability"
 
 start=time.time()
 
-k = 40
+k = 20
 Configs.rand.seed(0)
 Configs.U = 5
 Configs.speed = 5

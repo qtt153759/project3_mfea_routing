@@ -170,7 +170,7 @@ class Solution:
                 eAfterT = s.E0 - Configs.T * s.p + self.time[a][i] * ch.U
 
                 sensorDetails = f"{s.id} | {s.p:.2f} | {s.E0:.2f} | {arriveTime[i]:.2f} | {eRemain:.2f} | {self.time[a][i]:.2f} | {(self.time[a][i]*ch.U):.2f} | {eAfterCharged:.2f} | {eAfterT:.2f}"
-                f.write(f"{s.x} {s.y} {s.p} {max(eAfterT,s.Emin)}\n")
+                f.write(f"{s.x} {s.y} {s.p} {eAfterT}\n")
                 if (eRemain < s.Emin or eAfterT < s.Emin):
                     prRed(sensorDetails)
                     dead+=1
@@ -191,7 +191,7 @@ class Solution:
                 if (not visited[s.getId()]):
                     eAfterT = s.E0 - Configs.T * s.p
                     sensorDetails = f"{s.id} | {s.p:.2f} | {s.E0:.2f} | {eAfterT:.2f}"
-                    f.write(f"{s.x} {s.y} {s.p} {max(eAfterT,s.Emin)}\n")
+                    f.write(f"{s.x} {s.y} {s.p} {eAfterT}\n")
                     if (eAfterT < Configs.S_EMIN):
                         prRed(sensorDetails)
                         dead+=1
