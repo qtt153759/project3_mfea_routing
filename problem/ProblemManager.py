@@ -103,12 +103,18 @@ class ProblemManager:
                 ProblemManager.nodes.append(sensor)
 
             #init distance matrix 
+            # outF = open("ab.txt", "w")
+            # write line to output file
             for nodeX in ProblemManager.nodes:
                 templist = []
                 for nodeY in ProblemManager.nodes:
                     templist.append(nodeX.getDistance(nodeY))
-                ProblemManager.distance.append(templist)
+                #     outF.write(str(nodeX.getDistance(nodeY))+" ")
+                # outF.write("\n")
 
+                ProblemManager.distance.append(templist)
+            # outF.close()
+            # exit(0)
             #print(ProblemManager.distance) #debug
 
     @staticmethod

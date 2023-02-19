@@ -1,3 +1,4 @@
+from enum import Enum
 from random import Random
 
 class Configs:
@@ -22,3 +23,8 @@ class Configs:
     RMP = 0.3
     NC = 15
     NM = 15
+    networkSurvivabilityFitness=0.5
+    totalTimeRatioFitness=0.5
+
+    
+    mode= "default" #[default,two_opt,three_opt]

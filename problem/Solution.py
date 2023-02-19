@@ -155,11 +155,16 @@ class Solution:
                 sum += self.time[a][i]
 
             print("")
-
+            print(f"total node:{leng}/{len(ProblemManager.subNet[a])}")
+            print("-------------------")
             print(f"Traveling energy: {ch.getEmove(self.path[a])}")
             print(f"Charging energy: {sum * ch.U}")
             print(f"Total energy used: {ch.getEmove(self.path[a]) + sum * ch.U}")
+            print("-------------------")
+            print(f"Total time for travel: {ch.getEmove(self.path[a]) / ch.Pm }")
+            print(f"Total time for charging: {sum }")
             print(f"Charging round duration: {ch.getEmove(self.path[a]) / ch.Pm + sum}")
+            print("-------------------")
 
             print("ID | p | E0 | time_arrive | E_remain | time_charge | energy_charge| E_after_charge | E_after_cycle")
             arriveTime[0] = ProblemManager.distance[ProblemManager.serviceStation.getId()][self.path[a][0]] / Configs.speed

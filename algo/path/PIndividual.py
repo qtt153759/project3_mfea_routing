@@ -116,7 +116,7 @@ class PIndividual:
             # ub = (Configs.S_EMAX - eRemain) / (ch.U - s.p)
             if eRemain < Configs.S_EMIN:
                 self.chargingTime[i] = 0
-            # elif (self.chargingTime[i] > ub or True):
+            # elif (self.chargingTime[i] > ub):
             #     self.chargingTime[i] = ub
             eAfterT: float
             eAfterT = s.E0 - Configs.T * s.p + self.chargingTime[i] * ch.U
@@ -127,8 +127,10 @@ class PIndividual:
             lifetime = (s.E0 + self.chargingTime[i] * ch.U - s.Emin) / s.p
 
             ######
-            totalTimeRatio += lifetime / Configs.T
-
+            ratio= (eAfterT/s.p) / Configs.T
+            if ratio>1:
+                ratio=1
+            totalTimeRatio+=ratio 
             totalLifetime += lifetime
             maxLifetime = max(lifetime, maxLifetime)
             totalAfterT+=eAfterT
@@ -153,10 +155,16 @@ class PIndividual:
         netSize = len(ProblemManager.subNet[self.skillFactor])
         networkSurvivability = (netSize - dead) / (1.0 * netSize)
         energyRatioAfterT=totalAfterT/(netSize*Configs.S_EMAX)
+        totalTimeRatio=totalTimeRatio/netSize
         #unused
         #avgLifetime = totalLifetime / (1.0 * netSize)
+        # return networkSurvivability
+        # print("check",networkSurvivability," va ",totalTimeRatio)
 
-        return networkSurvivability*0.8+0.2*totalTimeRatio/netSize
+
+        return networkSurvivability*Configs.networkSurvivabilityFitness+totalTimeRatio*Configs.totalTimeRatioFitness
+
+        
         # return networkSurvivability*0.8+0.2*energyRatioAfterT   
 
     def calculateFitness(self) -> float:
@@ -296,6 +304,7 @@ class PIndividual:
                     a=sectorsDict[best_found_individual.path[t]]
                     b=sectorsDict[best_return_3_opt.path[t]]
                     best_return_3_opt.gene[b]=best_found_individual.gene[a]
+                # print("after opt decreas",best_found_individual.fitness-best_return_3_opt.fitness)
                 best_found_individual = best_return_3_opt
                 improved += 1
                 loopCounter = 0

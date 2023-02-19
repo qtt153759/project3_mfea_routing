@@ -24,7 +24,7 @@ else:
 outputPath = r"./output"
 #get a name for our output
 fileName = f"/{count}.txt"
-result = f"/{count}-survivability"
+result = f"/survivability.txt"
 
 
 
@@ -34,7 +34,11 @@ k = 20
 Configs.rand.seed(0)
 Configs.U = 5
 Configs.speed = 5
-Configs.E_MC = 100000
+Configs.E_MC = 108000
+Configs.networkSurvivabilityFitness=0.75 #1,0.75,0.5,0.25,0
+Configs.totalTimeRatioFitness=0.25       #0,0.25,0.5,0.75,1
+Configs.mode="default" #[default,two_opt,three_opt]
+
 
 #read input from file
 ProblemManager.readInput(outputPath+fileName,1.0)
@@ -44,7 +48,7 @@ count = count + 1
 fileName = f"/{count}.txt"
 
 for i in range(k):
-    ProblemManager.chargers.append(Charger(Configs.E_MC, Configs.speed, Configs.Pm, Configs.U))
+    ProblemManager.chargers.append(Charger(Configs.DEFAULT_EMC, Configs.speed, Configs.Pm, Configs.U))
 
 PSolver.reproductioner = MFEA_Reproductioner()
 solution = ProblemSolver.solve()
@@ -52,11 +56,12 @@ solution = ProblemSolver.solve()
 #log output to file
 solution.log(outputPath+fileName)
 
-f = open(outputPath+result, 'w')
-f.write(f"{ProblemManager.networkSurvivability}")
-f.write(f"{ProblemManager.networkSurvivabilityOverThousand}")
+f = open(outputPath+result, 'a')
+if count==1: 
+    f.write("\n***************************************************************************\n")
+    f.write(f"k={k}, fitness ratio = ({Configs.networkSurvivabilityFitness},{Configs.totalTimeRatioFitness}) => Total survie over 1000:\n" )
+f.write(f"{ProblemManager.networkSurvivabilityOverThousand}, ")
 f.close()
-result = f"/{count}-survivability"
 print("total calculate time:",time.time()-start)
 
     

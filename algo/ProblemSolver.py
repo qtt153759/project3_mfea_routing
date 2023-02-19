@@ -7,7 +7,8 @@ from algo.NetworkDivider import NetworkDivider
 from cycler import cycler
 import math
 import matplotlib.pyplot as plt
-
+import matplotlib.cm as cm
+import numpy as np
 class ProblemSolver:
 
     @staticmethod
@@ -34,24 +35,30 @@ class ProblemSolver:
                 + n * d / Configs.DEFAULT_SPEED
         Configs.P_POP_SIZE = ProblemManager.getTaskNumber() * Configs.P_POP_SIZE_PER_TASK
     #		System.out.println(Configs.T);
-
+        energyConsumePerT=0
+        for sensor in ProblemManager.sensors:
+            energyConsumePerT+=sensor.p*Configs.T
+        conditionChargerForInfinitive=energyConsumePerT/Configs.DEFAULT_EMC
+        print("condition",conditionChargerForInfinitive)
         #Test drawing
         # figure, axes = plt.subplots()
         # Drawing_uncolored_circle = plt.Circle( (ProblemManager.serviceStation.x, ProblemManager.serviceStation.y ), Configs.R , fill = False )
         # plt.xlim([ProblemManager.serviceStation.x - Configs.R*1.05, ProblemManager.serviceStation.x + Configs.R*1.05])
         # plt.ylim([ProblemManager.serviceStation.x - Configs.R*1.05, ProblemManager.serviceStation.x + Configs.R*1.05])
         # for index, subnet in enumerate(ProblemManager.subNet):
-        #     color = ['b','g','r','c','m','y','k']
+        #     # color = ['b','g','r','c','m','y','k']
+        #     color = cm.rainbow(np.linspace(0, 1, len(ProblemManager.subNet)))
+
         #     for node in subnet:
         #         axes.scatter(node.x, node.y, s=1,c=color[index%len(color)])
         #         #plt.plot(node.x, node.y, "go")
 
         #     phi = 2*math.pi / len(ProblemManager.subNet)
-        #     for i in range(len(ProblemManager.subNet)):
-        #         axes.plot([ProblemManager.serviceStation.x+Configs.R*math.cos(phi*i), \
-        #                    ProblemManager.serviceStation.x],\
-        #                   [ProblemManager.serviceStation.y+Configs.R*math.sin(phi*i),\
-        #                    ProblemManager.serviceStation.y], c='#000000')
+        #     # for i in range(len(ProblemManager.subNet)):
+        #     #     axes.plot([ProblemManager.serviceStation.x+Configs.R*math.cos(phi*i), \
+        #     #                ProblemManager.serviceStation.x],\
+        #     #               [ProblemManager.serviceStation.y+Configs.R*math.sin(phi*i),\
+        #     #                ProblemManager.serviceStation.y], c='#000000')
 
 
         #     axes.spines['left'].set_position('center')
