@@ -90,12 +90,19 @@ class MFEA_Reproductioner(Reproductioner):
             for indiv in child:
                 indiv.fitness = indiv.calculateFitness()
                 offspring.append(indiv)
+        print(len(offspring))
         if Configs.mode=="two_opt":
             for i in range(len(offspring)):
                 if Configs.rand.uniform(0,1)<0.1:
+                    # print("before ",i,offspring[i].fitness)
+                    # tmp=offspring[i].fitness
                     offspring[i]=offspring[i].tsp_2_opt()
+                    # print("after",i,tmp-offspring[i].fitness)
+
         elif Configs.mode=="three_opt":
             for i in range(len(offspring)):
                 if Configs.rand.uniform(0,1)<0.1:
+                    tmp= offspring[i].fitness
                     offspring[i]=offspring[i].tsp_3_opt()
+                    # print("after",i,tmp-offspring[i].fitness)
         return offspring
