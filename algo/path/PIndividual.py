@@ -113,11 +113,11 @@ class PIndividual:
             eRemain: float
             ub: float
             eRemain = s.E0 - arriveTime[i] * s.p
-            # ub = (Configs.S_EMAX - eRemain) / (ch.U - s.p)
+            ub = (Configs.S_EMAX - eRemain) / (ch.U - s.p)
             if eRemain < Configs.S_EMIN:
                 self.chargingTime[i] = 0
-            # elif (self.chargingTime[i] > ub):
-            #     self.chargingTime[i] = ub
+            elif (self.chargingTime[i] > ub ):
+                self.chargingTime[i] = ub
             eAfterT: float
             eAfterT = s.E0 - Configs.T * s.p + self.chargingTime[i] * ch.U
             if ( (eRemain < s.Emin - 1e-3) or (eAfterT < s.Emin - 1e-3) ) :
@@ -126,11 +126,8 @@ class PIndividual:
             lifetime: float
             lifetime = (s.E0 + self.chargingTime[i] * ch.U - s.Emin) / s.p
 
-            ######
-            ratio= (eAfterT/s.p) / Configs.T
-            if ratio>1:
-                ratio=1
-            totalTimeRatio+=ratio 
+
+
             totalLifetime += lifetime
             maxLifetime = max(lifetime, maxLifetime)
             totalAfterT+=eAfterT
@@ -138,6 +135,14 @@ class PIndividual:
             if (i < n - 1):
                 arriveTime[i + 1] = arriveTime[i] + self.chargingTime[i] \
                         + ProblemManager.distance[self.path[i]][self.path[i+1]] / ch.speed
+            ######
+            timeSurvivalAterT=eAfterT/s.p
+            ratio= timeSurvivalAterT/ Configs.T
+            # print(ratio)
+            # if ratio>3:
+            #     ratio=3
+            totalTimeRatio+=ratio #/3 
+            # print(ratio)
             
         for s in ProblemManager.subNet[self.skillFactor]:
             if (not visited[s.id]):
@@ -158,18 +163,13 @@ class PIndividual:
         totalTimeRatio=totalTimeRatio/netSize
         #unused
         #avgLifetime = totalLifetime / (1.0 * netSize)
-        # return networkSurvivability
-        # print("check",networkSurvivability," va ",totalTimeRatio)
 
-
-        return networkSurvivability*Configs.networkSurvivabilityFitness+totalTimeRatio*Configs.totalTimeRatioFitness
-
-        
+        return networkSurvivability*Configs.networkSurvivabilityFitness+totalTimeRatio *Configs.totalTimeRatioFitness
         # return networkSurvivability*0.8+0.2*energyRatioAfterT   
 
     def calculateFitness(self) -> float:
         """How good the individual is"""
-        self.decoding(self.skillFactor) #from gene -> get path
+        self.decoding(self.skillFactor) #from gên -> get path
         return self.calculateFitnessWithPath()
 
     def getPriority(self) -> 'list[float]':
@@ -246,7 +246,7 @@ class PIndividual:
         loopCounter = 0
         while improved<10:
             loopCounter += 1
-            if loopCounter > 5000: #prevent dead loop
+            if loopCounter > 1000: #prevent dead loop
                 break
             #print(f"2 opt improved {improved}, loop counter {loopCounter}")
             i =Configs.rand.randint(1,len(best_found_individual.path) - 2)
@@ -287,7 +287,7 @@ class PIndividual:
         best_found_individual.fitness=best_found_individual.fitness
         while improved<3:
             loopCounter += 1
-            if loopCounter > 5000: #prevent dead loop
+            if loopCounter > 1000: #prevent dead loop
                 break
             #print(f"3 opt improved {improved}, loop counter {loopCounter}")
             k= Configs.rand.randint(2,len(best_found_individual.path) - 2)
@@ -304,7 +304,6 @@ class PIndividual:
                     a=sectorsDict[best_found_individual.path[t]]
                     b=sectorsDict[best_return_3_opt.path[t]]
                     best_return_3_opt.gene[b]=best_found_individual.gene[a]
-                # print("after opt decreas",best_found_individual.fitness-best_return_3_opt.fitness)
                 best_found_individual = best_return_3_opt
                 improved += 1
                 loopCounter = 0

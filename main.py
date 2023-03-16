@@ -35,8 +35,8 @@ Configs.rand.seed(0)
 Configs.U = 5
 Configs.speed = 5
 Configs.E_MC = 108000
-Configs.networkSurvivabilityFitness=0.75 #1,0.75,0.5,0.25,0
-Configs.totalTimeRatioFitness=0.25       #0,0.25,0.5,0.75,1
+Configs.networkSurvivabilityFitness=0.8 #1,0.75,0.5,0.25,0
+Configs.totalTimeRatioFitness=0.2       #0,0.25,0.5,0.75,1
 Configs.mode="default" #[default,two_opt,three_opt]
 
 
